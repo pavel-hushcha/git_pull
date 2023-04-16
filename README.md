@@ -1,4 +1,4 @@
-# Git Pull Script
+# Git Pull Script (uses only standard libraries)
 
 This is a Python script for automating the `git pull` command in multiple Git repositories located within a specified folder. It recursively searches for Git repositories in subdirectories of the provided folder and performs a `git pull` operation in each repository.
 
