@@ -36,7 +36,7 @@ def pull_git(directory: str) -> None:
     )
     try:
         stdout_data, stderr_data = process.communicate(timeout=10)
-        print(f'Pulled git in {directory}')
+        print(f'Pulling git in {directory}')
         print(stdout_data, stderr_data)
     except subprocess.TimeoutExpired:
         process.kill()
