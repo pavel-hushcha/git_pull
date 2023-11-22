@@ -44,7 +44,7 @@ def pull_git(directory: str) -> tuple[str, str]:
 
 
 def main() -> None:
-    start_time = time.time()
+    start_time = time.perf_counter()
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--path', action='store', type=pathlib.Path, help='The path to the folder for git pull.')
@@ -55,34 +55,22 @@ def main() -> None:
         raise parser.error('Path must be a directory.')
     git_directories = find_git_directories(path)
     if git_directories:
-        results: dict[str, dict] = {}
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = {}
             for directory in git_directories:
                 future = executor.submit(pull_git, directory)
                 futures[future] = directory
-
-            for future in concurrent.futures.as_completed(futures):
+            for number, future in enumerate(concurrent.futures.as_completed(futures)):
                 stdout_data, stderr_data = future.result()
-                results[futures[future]] = {
-                    "Success": stdout_data,
-                    "Failed": stderr_data,
-                }
-
-        for number, directory in enumerate(results):
-            print()
-            print(f'{number + 1}. Path: {directory}')
-            print(results[directory]["Success"].rstrip())
-            if results[directory]["Failed"]:
-                print(results[directory]["Failed"].rstrip())
+                print(f'{number + 1}. Path: {futures[future]}')
+                print(stdout_data)
+                print(stderr_data)
     else:
         print('No GIT directories have been found.')
 
-    print('================================================================================')
+    print('=' * 80)
     print(f'Processed {len(git_directories)} GIT directories. Please see the details above.')
-    end_time = time.time()
-    duration = end_time - start_time
-    print(f"Duration of execution: {duration:.2f} seconds")
+    print(f"Duration of execution: {(time.perf_counter() - start_time): .2f} seconds")
 
 
 if __name__ == '__main__':
